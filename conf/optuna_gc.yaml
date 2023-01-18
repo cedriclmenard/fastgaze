@@ -1,0 +1,155 @@
+defaults:
+  - dataset: gc_faze
+  - override hydra/sweeper: optuna
+  - override hydra/sweeper/sampler: tpe
+  
+
+hydra:
+  sweeper:
+    sampler:
+      seed: 123
+    direction: minimize
+    study_name: gc_faze_trials
+    storage: mysql+pymysql://cedric:cLm41194!@168.138.71.83:3306/optuna
+    n_trials: 40
+    n_jobs: 1
+
+    search_space:
+      # start_lr:
+      #   type: float
+      #   low: 1e-7
+      #   high: 1e-3
+      #   log: True
+      # end_lr_factor:
+      #   type: categorical
+      #   choices: [1.0, 1e-1, 1e-2, 1e-3]
+      # architecture.head.dense:
+      #   type: categorical
+      #   choices: [False, True]
+      # train_options.lr: ${hydra.sweeper.search_space.start_lr}
+      train_options.lr:
+        type: categorical
+        choices: [1e-3, 1e-4, 1e-5]
+      train_options.wd:
+          type: categorical
+          choices: [0.1, 1e-3, 1e-5, 0.0]
+
+      train_options.single_step_lr.start_after:
+        type: categorical
+        choices: [150, 10, 20]
+
+      architecture.split_gaze.n_layers_mod:
+        type: categorical
+        choices: [2, 3]
+      # train_options.dropout_split:
+      #     type: categorical
+      #     choices: [0.1, 0.0]
+      # train_options.dropout_head:
+      #     type: categorical
+      #     choices: [0.1, 0.0]
+      # train_options.single_step_lr.start_after:
+      #   type: int
+      #   low: 2
+      #   high: 10
+      # train_options.single_step_lr.factor: ${hydra.sweeper.search_space.end_lr_factor}
+      # train_options.swa.scheduler_lr_factor: ${hydra.sweeper.search_space.end_lr_factor}
+      # train_options.single_step_lr.factor:
+      #   type: categorical
+      #   choices: [1.0, 1e-1, 1e-2, 1e-3]
+      # train_options.swa.scheduler_lr_factor:
+      #   type: categorical
+      #   choices: [1.0, 1e-1, 1e-2, 1e-3]
+      
+      # run_options.augment.color_jitter:
+      #   type: categorical
+      #   choices: [False, True]
+      # run_options.augment.random_affine:
+      #   type: categorical
+      #   choices: [False, True]
+      # run_options.augment.grayscale:
+      #   type: categorical
+      #   choices: [False, True]
+          
+      
+
+name: gc_faze_trained
+# start_lr: 1e-4
+# end_lr_factor: 1e-3
+architecture:
+  type: combined
+  mod: False
+  mlp: True
+  pose: True
+  use_head_yaw_pitch: False
+  split_gaze:
+    n_layers: [3,3,3]
+    n_layers_mod: 0 # used to set the n_layers array to [n_layers_mod, n_layers_mod, n_layers_mod] if not 0
+    output_features: 50
+  head:
+    dense: False
+    n_layers: 2
+    hidden_features: 50
+
+train_options:
+  lr: 1e-3
+  wd: 0.0
+  sgd: False
+  angular_loss: False
+  # scheduling: 0
+  dropout: 0.0
+  dropout_gaussian: false
+  dropout_split: 0.0
+  dropout_split_gaussian: false
+  dropout_head: 0.0
+  no_bn: False
+  batch_size: 128
+  single_step_lr:
+    start_after: 200
+    factor: 0.1
+  # step_lr:
+  #   step_size: 6
+  #   factor: 0.3
+  max_epochs: 60
+  
+  swa:
+    enabled: False
+    start: 0.75 # can be a proportion of max epoch like 0.75 or a specific epoch like 12
+    scheduler_lr_factor: 0.01
+    # lr: 0.0000662002
+    disable_scheduling: True
+  person_loss: False
+  bn_splits: 4
+  num_groups: 4
+  lr_scheduling_updates_per_epoch: 1
+  split_train_epochs: 10
+
+
+
+run_options:
+  test: True
+  val: True
+  num_workers: -1 # means same as cpu count
+  faze_split: True
+  leave_out: None
+  leave_out_val: 1
+  augment:
+    enabled: False
+    color_jitter: True
+    random_affine: True
+    grayscale: True
+    random_affine_degrees_variation: 0.0
+    random_affine_translate: 0.1
+    random_affine_scale_variation: 0.1
+    color_jitter_brightness: 0.4
+    color_jitter_contrast: 0.4
+    color_jitter_saturation: 0.4
+    color_jitter_hue: 0.1
+  memory: False
+  preprocess: False
+  load_split: None
+  # split: 0.8
+  save: True
+
+
+dataset_path: ~/datasets/hdf5/
+  

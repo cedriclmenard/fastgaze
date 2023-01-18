@@ -1,0 +1,98 @@
+defaults:
+  - dataset: mpiig
+          
+      
+
+name: mpiig_trained
+# start_lr: 1e-4
+# end_lr_factor: 1e-3
+architecture:
+  type: simple_full
+  mod: False
+  mlp: True
+  pose: True
+  use_head_yaw_pitch: False
+  split_gaze:
+    n_layers: [2,2,2]
+    n_layers_mod: 0 # used to set the n_layers array to [n_layers_mod, n_layers_mod, n_layers_mod] if not 0
+    output_features: 50
+  head:
+    dense: False
+    n_layers: 2
+    hidden_features: 50
+
+train_options:
+  lr: 1e-3
+  wd: 0.001
+  sgd: False
+  adam: False
+  adabound: False
+  ranger: True
+  angular_loss: False
+  # scheduling: 0
+  dropout: 0.0
+  dropout_gaussian: False
+  dropout_split: 0.1
+  dropout_split_gaussian: False
+  dropout_head: 0.1
+  no_bn: False
+  batch_size: 64
+  # single_step_lr:
+  #   start_after: 5
+  #   factor: 0.1
+  # step_lr:
+  #   step_size: 5000
+  #   factor: 0.3
+  #   per_epoch: False
+  # step_lr_until:
+  #   step_size: 5000
+  #   factor: 0.3
+  #   until: 20000
+  #   per_epoch: False
+  max_epochs: 15
+  lr_scheduling_updates_per_epoch: 1
+  swa:
+    enabled: False
+    start: 0.75 # can be a proportion of max epoch like 0.75 or a specific epoch like 12
+    scheduler_lr_factor: 0.01
+    # lr: 0.0000662002
+    disable_scheduling: True
+  person_loss: False
+  bn_splits: 0
+  ranger_b1: 0.8
+  ranger_b2: 0.7
+
+
+
+run_options:
+  test: True
+  val: True
+  num_workers: -1 # means same as cpu count
+  faze_split: False
+  leave_out:
+    idx_val: 0
+    idx_test: 0
+  augment:
+    enabled: True
+    color_jitter: True
+    random_affine: True
+    grayscale: True
+    random_affine_degrees_variation: 2.0
+    random_affine_translate: 0.05
+    random_affine_scale_variation: 0.05
+    color_jitter_brightness: 0.4
+    color_jitter_contrast: 0.4
+    color_jitter_saturation: 0.4
+    color_jitter_hue: 0.1
+    dev_head_yaw_pitch: 0.0
+    normalize_colors: True
+  memory: False
+  preprocess: False
+  load_split: False
+  # split: 0.8
+  save: True
+  new_norm: False
+
+
+dataset_path: ~/datasets/hdf5/
+  

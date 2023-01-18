@@ -1,0 +1,39 @@
+# @package _global_
+name: mpiig_test
+
+architecture:
+  mlp: True
+  split_gaze:
+    n_layers: [2,2,2]
+    output_features: 50
+  head:
+    dense: False
+    n_layers: 2
+    hidden_features: 50
+
+train_options:
+  lr: 1.5e-6
+  wd: 0.1
+  dropout_head: 0.0
+  dropout_split: 0.1
+  # single_step_lr:
+  #   start_after: 2
+  #   factor: 1e-3
+  # cosine_annealing_lr:
+  #   t_max: 10
+  #   eta_min: 1e-8
+  max_epochs: 20
+  swa:
+    enabled: True
+    start: 0.75 # can be a proportion of max epoch like 0.75 or a specific epoch like 12
+    scheduler_lr_factor: 1e-2
+
+run_options:
+  test: True
+  val: False
+  leave_out: 9
+  augment:
+    enabled: True
+    random_affine: True
+    color_jitter: True
+    grayscale: True

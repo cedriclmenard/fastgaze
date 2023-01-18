@@ -1,0 +1,4 @@
+hdf5_name: gc_faze.hdf5
+mpiig: False
+mpiifg: False
+gc: True

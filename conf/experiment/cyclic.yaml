@@ -1,0 +1,36 @@
+# @package _global_
+name: cyclic_experiment
+
+architecture:
+  mlp: True
+  split_gaze:
+    n_layers: [2,2,2]
+    output_features: 50
+  head:
+    n_layers: 2
+    hidden_features: 50
+
+train_options:
+  lr: 1e-4
+  wd: 0.1
+  dropout_head: 0.1
+  cosine_annealing_warm_restarts:
+    t_0: 10
+    eta_min: 1e-7
+  # single_step_lr:
+  #   start_after: 10
+  #   factor: 0.1
+  max_epochs: 20
+  swa:
+    enabled: True
+    start: 0.75 # can be a proportion of max epoch like 0.75 or a specific epoch like 12
+    scheduler_lr_factor: 0.01
+  lr_scheduling_updates_per_epoch: 2
+
+run_options:
+  test: True
+  val: False
+  leave_out: 9
+  augment: False
+  augment_options:
+    grayscale: True
